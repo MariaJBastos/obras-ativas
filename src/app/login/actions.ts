@@ -9,7 +9,11 @@ export async function login(_prev: string | null, formData: FormData): Promise<s
   if (!expected) return 'A password do site ainda não está configurada (SITE_PASSWORD).'
 
   const password = String(formData.get('password') ?? '')
-  if (!safeEqual(password, expected)) return 'Password errada.'
+  if (!safeEqual(password, expected)) {
+    // Atrasa cada tentativa falhada para tornar tentativas em massa mais lentas.
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+    return 'Password errada.'
+  }
 
   const cookieStore = await cookies()
   cookieStore.set(AUTH_COOKIE, await authToken(expected), {

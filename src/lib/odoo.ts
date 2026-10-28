@@ -69,15 +69,22 @@ const CLOSED_STAGE = /done|conclu|cancel/i
 
 // Ativos = não arquivados, com cliente (exclui "buckets" internos como
 // "Interno") e fora das fases Done/Cancelled. Inclui "Em preparação".
+// Projetos cujo cliente é a própria empresa (ex: PR0098/PR0099 "Geral…",
+// cliente Triad.AI) são internos, não obras — também ficam de fora.
 export async function getActiveProjects(): Promise<ActiveProject[]> {
   const uid = await authenticateOdoo()
-  const projects = await execKw(uid, 'project.project', 'search_read',
-    [[['active', '=', true], ['is_template', '=', false], ['partner_id', '!=', false]]],
-    { fields: ['id', 'name', 'partner_id', 'label_tasks', 'stage_id'], order: 'name asc', limit: 500 }
-  ) as RawProject[]
+  const [projects, companies] = await Promise.all([
+    execKw(uid, 'project.project', 'search_read',
+      [[['active', '=', true], ['is_template', '=', false], ['partner_id', '!=', false]]],
+      { fields: ['id', 'name', 'partner_id', 'label_tasks', 'stage_id'], order: 'name asc', limit: 500 }
+    ) as Promise<RawProject[]>,
+    execKw(uid, 'res.company', 'search_read', [[]], { fields: ['partner_id'] }) as Promise<{ partner_id: OdooRelation }[]>,
+  ])
+  const companyPartners = new Set(companies.flatMap((c) => Array.isArray(c.partner_id) ? [c.partner_id[0]] : []))
 
   return projects
     .filter((p) => !(Array.isArray(p.stage_id) && CLOSED_STAGE.test(p.stage_id[1])))
+    .filter((p) => !(Array.isArray(p.partner_id) && companyPartners.has(p.partner_id[0])))
     .map((p) => ({
       id: p.id,
       code: p.name,
