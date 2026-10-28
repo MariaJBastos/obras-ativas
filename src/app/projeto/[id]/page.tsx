@@ -4,12 +4,14 @@ import { ArrowLeft, Package } from 'lucide-react'
 import Header from '@/components/Header'
 import StageBadge from '@/components/StageBadge'
 import { getActiveProjects, getProjectMaterials } from '@/lib/odoo'
+import { requireAuth } from '@/lib/session'
 
 export const dynamic = 'force-dynamic'
 
 const formatQty = (n: number) => n.toLocaleString('pt-PT', { maximumFractionDigits: 3 })
 
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAuth()
   const { id } = await params
   const projectId = Number(id)
   if (!Number.isInteger(projectId)) notFound()

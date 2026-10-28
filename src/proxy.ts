@@ -15,5 +15,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  // Só deixa passar sem login os ficheiros públicos que existem de facto
+  // (não "qualquer coisa terminada em .png", que também apanhava páginas).
+  matcher: ['/((?!_next/static|favicon\\.ico$|triad-logo\\.jpg$).*)'],
 }

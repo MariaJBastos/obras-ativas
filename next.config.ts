@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // A app não usa next/image: desligar o otimizador de imagens elimina essa
+  // superfície de ataque (várias falhas graves do Next foram aí).
+  images: { unoptimized: true },
   async headers() {
     return [
       {
