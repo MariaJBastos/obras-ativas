@@ -32,11 +32,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
         <section className="bg-white rounded-xl border border-slate-200 p-4 space-y-1">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="font-bold text-navy text-xl">{project.code}</h2>
+            <span className="text-sm font-bold text-navy">{project.code}</span>
             <StageBadge stage={project.stage} />
           </div>
-          {project.client && <p className="font-medium text-slate-700">{project.client}</p>}
-          {project.title && <p className="text-sm text-slate-500">{project.title}</p>}
+          <h2 className="text-lg font-semibold text-slate-900 leading-snug">{project.title ?? project.client}</h2>
+          {project.title && project.client && <p className="text-sm text-slate-400">{project.client}</p>}
         </section>
 
         <section className="bg-white rounded-xl border border-slate-200">

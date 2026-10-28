@@ -1,6 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { aggregateMaterials, analyticShare, normalize } from '../src/lib/materials.ts'
+import { compareProjectCodes } from '../src/lib/projects.ts'
 
 const line = (over) => ({
   id: 1, name: 'x', product_id: [10, 'Cabo H07V-K 2,5mm2'], product_qty: 100,
@@ -53,4 +54,11 @@ test('linha sem produto usa a descrição', () => {
 
 test('pesquisa ignora acentos e maiúsculas', () => {
   assert.equal(normalize('Filtro Via Húmida – Dragão Abrasivo').includes(normalize('DRAGAO')), true)
+})
+
+
+test('ordem: PR por número crescente, depois AT, depois o resto', () => {
+  const codes = ['AT0013', 'PR0100', 'AT0009', 'FM0004', 'PR0003', 'PR0021', 'XYZ', 'PR0010']
+  assert.deepEqual([...codes].sort(compareProjectCodes),
+    ['PR0003', 'PR0010', 'PR0021', 'PR0100', 'AT0009', 'AT0013', 'FM0004', 'XYZ'])
 })

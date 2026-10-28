@@ -43,13 +43,15 @@ export default function ProjectList({ projects }: { projects: ActiveProject[] })
               href={`/projeto/${p.id}`}
               className="flex items-center gap-3 bg-white rounded-xl border border-slate-200 p-4 active:bg-slate-50 hover:border-gold"
             >
+              {/* A descrição da obra é o que a equipa reconhece no terreno;
+                  o cliente fica como informação secundária. */}
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-bold text-navy text-lg">{p.code}</span>
+                  <span className="text-sm font-bold text-navy">{p.code}</span>
                   <StageBadge stage={p.stage} />
                 </div>
-                {p.client && <p className="text-sm font-medium text-slate-700">{p.client}</p>}
-                {p.title && <p className="text-sm text-slate-500">{p.title}</p>}
+                <p className="text-base font-semibold text-slate-900 leading-snug">{p.title ?? p.client}</p>
+                {p.title && p.client && <p className="text-xs text-slate-400">{p.client}</p>}
               </div>
               <ChevronRight className="w-5 h-5 text-slate-400 shrink-0" />
             </Link>

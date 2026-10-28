@@ -1,5 +1,6 @@
 import 'server-only'
 import { aggregateMaterials, type Material, type OdooRelation, type PurchaseLine } from './materials'
+import { compareProjectCodes } from './projects'
 
 // Esta app só LÊ do Odoo — nunca escrever (write/create/unlink) aqui.
 // Também nunca pedir campos de preço/faturação (price_*, qty_invoiced, ...):
@@ -99,6 +100,7 @@ export async function getActiveProjects(): Promise<ActiveProject[]> {
       title: cleanProjectTitle(p.label_tasks),
       stage: Array.isArray(p.stage_id) ? p.stage_id[1] : null,
     }))
+    .sort((a, b) => compareProjectCodes(a.code, b.code))
 }
 
 async function readAll<T>(uid: number, model: string, domain: unknown[], fields: string[]): Promise<T[]> {
