@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { aggregateMaterials, analyticShare, normalize } from '../src/lib/materials.ts'
-import { compareProjectCodes } from '../src/lib/projects.ts'
+import { compareProjectCodes, sortProjects } from '../src/lib/projects.ts'
 
 const line = (over) => ({
   id: 1, name: 'x', product_id: [10, 'Cabo H07V-K 2,5mm2'], product_qty: 100,
@@ -61,4 +61,26 @@ test('ordem: PR por número crescente, depois AT, depois o resto', () => {
   const codes = ['AT0013', 'PR0100', 'AT0009', 'FM0004', 'PR0003', 'PR0021', 'XYZ', 'PR0010']
   assert.deepEqual([...codes].sort(compareProjectCodes),
     ['PR0003', 'PR0010', 'PR0021', 'PR0100', 'AT0009', 'AT0013', 'FM0004', 'XYZ'])
+})
+
+const sample = [
+  { code: 'AT0009', client: 'SITAPE', title: 'Intervenções técnicas' },
+  { code: 'PR0021', client: 'PRONICOL', title: 'Eletrificação Torre' },
+  { code: 'PR0003', client: 'SITAPE', title: 'Automação Linha' },
+  { code: 'PR0010', client: 'ERI Engenharia', title: null },
+]
+const codes = (list) => list.map((p) => p.code)
+
+test('ordenar por nº: crescente e decrescente', () => {
+  assert.deepEqual(codes(sortProjects(sample, 'code', 'asc')), ['PR0003', 'PR0010', 'PR0021', 'AT0009'])
+  assert.deepEqual(codes(sortProjects(sample, 'code', 'desc')), ['AT0009', 'PR0021', 'PR0010', 'PR0003'])
+})
+
+test('ordenar por cliente: empates por nº de projeto', () => {
+  assert.deepEqual(codes(sortProjects(sample, 'client', 'asc')), ['PR0010', 'PR0021', 'PR0003', 'AT0009'])
+  assert.deepEqual(codes(sortProjects(sample, 'client', 'desc')), ['PR0003', 'AT0009', 'PR0021', 'PR0010'])
+})
+
+test('ordenar por obra: sem título usa o cliente, ignora acentos', () => {
+  assert.deepEqual(codes(sortProjects(sample, 'title', 'asc')), ['PR0003', 'PR0021', 'PR0010', 'AT0009'])
 })
