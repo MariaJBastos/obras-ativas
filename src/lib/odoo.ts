@@ -90,6 +90,8 @@ export async function getActiveProjects(): Promise<ActiveProject[]> {
   return projects
     .filter((p) => !(Array.isArray(p.stage_id) && CLOSED_STAGE.test(p.stage_id[1])))
     .filter((p) => !(Array.isArray(p.partner_id) && companyPartners.has(p.partner_id[0])))
+    // Projetos FM… não são para a equipa de campo (pedido da Maria João).
+    .filter((p) => !/^FM/i.test(p.name.trim()))
     .map((p) => ({
       id: p.id,
       code: p.name,
