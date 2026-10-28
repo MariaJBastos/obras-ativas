@@ -33,7 +33,12 @@ async function rpc(service: 'common' | 'object', method: string, args: unknown[]
 
 async function authenticateOdoo(): Promise<number> {
   const uid = await rpc('common', 'authenticate', [ODOO_DB, ODOO_USERNAME, ODOO_API_KEY, {}])
-  if (typeof uid !== 'number' || uid === 0) throw new Error('Odoo: autenticação falhou — verifica as credenciais e API key')
+  if (typeof uid !== 'number' || uid === 0) {
+    // Só comprimentos e espaços nas pontas (nunca os valores), para
+    // diagnosticar variáveis mal coladas no Vercel a partir dos logs.
+    const describe = (v: string | undefined) => v === undefined ? 'em falta' : `${v.length} carateres${v !== v.trim() ? ', COM espaços/mudança de linha nas pontas' : ''}`
+    throw new Error(`Odoo: autenticação falhou — verifica as credenciais e API key (ODOO_USERNAME: ${describe(ODOO_USERNAME)}; ODOO_API_KEY: ${describe(ODOO_API_KEY)}; ODOO_DB: ${describe(ODOO_DB)})`)
+  }
   return uid
 }
 
